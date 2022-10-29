@@ -1,0 +1,5 @@
+# Humpy config
+
+config:
+  thumbnail:
+    impl: linux
