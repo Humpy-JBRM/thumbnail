@@ -9,7 +9,16 @@ A web service to generate thumbnails of:
 
 For video, the thumbnail is an animated gif of a selection of the video frames.  For all other types, the thumbnail is a PNG with width 300
 
-## Installing
+## Running on Docker
+
+	- make thumbnailer docker
+
+	- docker run -p 8000:8000 thumbnailer:latest
+
+and the thumbnailer will be running on http://localhost:8000.
+
+
+## Installing (VPS or server)
 This must be run on a linux machine.
 
 The commands below assume Ubuntu.
