@@ -1,7 +1,7 @@
 package facade
 
 import (
-	"os"
+	"net/url"
 	"thumbnailer/src/data"
 )
 
@@ -15,6 +15,6 @@ func NewNaiiveThumbnailer(err error) Thumbnailer {
 	}
 }
 
-func (t *naiiveThumbnailer) GetThumbnail(f *os.File) (data.Thumbnail, error) {
+func (t *naiiveThumbnailer) GetThumbnail(u *url.URL) (data.Thumbnail, error) {
 	panic("TODO(john): Implement naive thumbnailer")
 }

@@ -3,7 +3,7 @@ package facade
 import (
 	"bytes"
 	"fmt"
-	"io"
+	"net/url"
 	"os"
 	"thumbnailer/src/data"
 
@@ -27,15 +27,15 @@ func NewImageThumbnailer() Thumbnailer {
 	}
 }
 
-func (t *imageThumbnailer) GetThumbnail(f *os.File) (data.Thumbnail, error) {
+func (t *imageThumbnailer) GetThumbnail(u *url.URL) (data.Thumbnail, error) {
 	// Step 1: Decode the image
-	fileBytes, err := io.ReadAll(f)
+	fileBytes, err := os.ReadFile(u.Path)
 	if err != nil {
-		return nil, fmt.Errorf("image.GetThumbnail(%s): Could not decode image: %s", f.Name(), err.Error())
+		return nil, fmt.Errorf("image.GetThumbnail(%s): Could not decode image: %s", u.Path, err.Error())
 	}
 	im, _, err := image.Decode(bytes.NewReader(fileBytes))
 	if err != nil {
-		return nil, fmt.Errorf("image.GetThumbnail(%s): Could not decode image: %s", f.Name(), err.Error())
+		return nil, fmt.Errorf("image.GetThumbnail(%s): Could not decode image: %s", u.Path, err.Error())
 	}
 
 	newImage := im
@@ -48,12 +48,12 @@ func (t *imageThumbnailer) GetThumbnail(f *os.File) (data.Thumbnail, error) {
 	buf := bytes.NewBuffer(make([]byte, 0))
 	err = png.Encode(buf, newImage)
 	if err != nil {
-		return nil, fmt.Errorf("image.GetThumbnail(%s): Could not encode image: %s", f.Name(), err.Error())
+		return nil, fmt.Errorf("image.GetThumbnail(%s): Could not encode image: %s", u.Path, err.Error())
 	}
 
 	mt := mimetype.Detect(buf.Bytes())
 	if mt == nil {
-		return nil, fmt.Errorf("image.GetThumbnail(%s): Could not get thumbnail mime type", f.Name())
+		return nil, fmt.Errorf("image.GetThumbnail(%s): Could not get thumbnail mime type", u.Path)
 	}
 
 	// Step 4: Generate the thumbnail object and return

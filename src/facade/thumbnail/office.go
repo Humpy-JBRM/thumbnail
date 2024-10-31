@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -23,12 +24,12 @@ func NewOfficeThumbnailer() Thumbnailer {
 	}
 }
 
-func (t *officeThumbnailer) GetThumbnail(f *os.File) (data.Thumbnail, error) {
+func (t *officeThumbnailer) GetThumbnail(u *url.URL) (data.Thumbnail, error) {
 	// Step 1: Create a temporary dir
 	dir, err := os.MkdirTemp("", "*-office")
 	if err != nil {
-		log.Printf("office.GetThumbnail(%s): Could not create temp dir: %s", f.Name(), err.Error())
-		return nil, fmt.Errorf("office.GetThumbnail(%s): Could not create temp dir: %s", f.Name(), err.Error())
+		log.Printf("office.GetThumbnail(%s): Could not create temp dir: %s", u.Path, err.Error())
+		return nil, fmt.Errorf("office.GetThumbnail(%s): Could not create temp dir: %s", u.Path, err.Error())
 	}
 	defer os.RemoveAll(dir)
 
@@ -42,23 +43,23 @@ func (t *officeThumbnailer) GetThumbnail(f *os.File) (data.Thumbnail, error) {
 		"png",
 		"--outdir",
 		dir,
-		f.Name(),
+		u.Path,
 	}
 	err = util.RunCommand(dir, cmd, 10, map[string]string{}, args...)
 	if err != nil {
-		log.Printf("office.GetThumbnail(%s): Could not generate thumbnail: %s", f.Name(), err.Error())
-		return nil, fmt.Errorf("office.GetThumbnail(%s): Could not generate thumbnail: %s", f.Name(), err.Error())
+		log.Printf("office.GetThumbnail(%s): Could not generate thumbnail: %s", u.Path, err.Error())
+		return nil, fmt.Errorf("office.GetThumbnail(%s): Could not generate thumbnail: %s", u.Path, err.Error())
 	}
 
-	sourceFile := filepath.Join(dir, filepath.Base(f.Name())+"[0]")
+	sourceFile := filepath.Join(dir, filepath.Base(u.Path)+"[0]")
 	if _, err := os.Stat(sourceFile); err != nil {
 		// Perhaps there was only 1 page in the doc
-		sourceFile = filepath.Join(dir, strings.ReplaceAll(filepath.Base(f.Name()), filepath.Ext(f.Name()), ".png"))
+		sourceFile = filepath.Join(dir, strings.ReplaceAll(filepath.Base(u.Path), filepath.Ext(u.Path), ".png"))
 	}
 	// Step 4: Convert this image to a thumbnail with ImageMagick
 	// convert -thumbnail x300 /tmp/ScottLogic.png /tmp/thumb.png
 	cmd = "convert"
-	thumbnailFile := filepath.Join(dir, filepath.Base(f.Name())+"-thumb.png")
+	thumbnailFile := filepath.Join(dir, filepath.Base(u.Path)+"-thumb.png")
 	args = []string{
 		"-thumbnail",
 		"x300",
@@ -67,15 +68,15 @@ func (t *officeThumbnailer) GetThumbnail(f *os.File) (data.Thumbnail, error) {
 	}
 	err = util.RunCommand(dir, cmd, 10, map[string]string{}, args...)
 	if err != nil {
-		fmt.Printf("office.GetThumbnail(%s): Could not generate thumbnail: %s", f.Name(), err.Error())
-		return nil, fmt.Errorf("office.GetThumbnail(%s): Could not generate thumbnail: %s", f.Name(), err.Error())
+		fmt.Printf("office.GetThumbnail(%s): Could not generate thumbnail: %s", u.Path, err.Error())
+		return nil, fmt.Errorf("office.GetThumbnail(%s): Could not generate thumbnail: %s", u.Path, err.Error())
 	}
 
 	// Step 5: Get the thumbnail bytes
 	thumbnailBytes, err := os.ReadFile(thumbnailFile)
 	if err != nil {
-		fmt.Printf("office.GetThumbnail(%s): Could not get thumbnail bytes: %s", f.Name(), err.Error())
-		return nil, fmt.Errorf("office.GetThumbnail(%s): Could not get thumbnail bytes: %s", f.Name(), err.Error())
+		fmt.Printf("office.GetThumbnail(%s): Could not get thumbnail bytes: %s", u.Path, err.Error())
+		return nil, fmt.Errorf("office.GetThumbnail(%s): Could not get thumbnail bytes: %s", u.Path, err.Error())
 	}
 
 	// Step 6: Set the width and height of the thumbnail
@@ -83,8 +84,8 @@ func (t *officeThumbnailer) GetThumbnail(f *os.File) (data.Thumbnail, error) {
 
 	mt := mimetype.Detect(thumbnailBytes)
 	if mt == nil {
-		fmt.Printf("office.GetThumbnail(%s): Could not get thumbnail mime type", f.Name())
-		return nil, fmt.Errorf("office.GetThumbnail(%s): Could not get thumbnail mime type", f.Name())
+		fmt.Printf("office.GetThumbnail(%s): Could not get thumbnail mime type", u.Path)
+		return nil, fmt.Errorf("office.GetThumbnail(%s): Could not get thumbnail mime type", u.Path)
 	}
 
 	// Step 7: Generate the thumbnail object and return

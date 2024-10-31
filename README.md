@@ -6,6 +6,7 @@ A web service to generate thumbnails of:
   - office documents
   - pdf documents
   - video
+  - web pages / URLs
 
 For video, the thumbnail is an animated gif of a selection of the video frames.  For all other types, the thumbnail is a PNG with width 300
 
@@ -41,6 +42,7 @@ Install the required packages:
     sudo apt install -y apt-transport-https 
     sudo apt install -y curl
     sudo apt install -y wget
+    sudo apt install -y google-chrome-stable
 
 Install go 1.21 from https://golang.org.
 
@@ -68,11 +70,18 @@ The endpoint of the thumbnailer is `http://localhost:8000/api/thumbnail`
 
 This endpoint takes a `POST` request, with a content type of `multipart/form-data`.  So you can either invoke it from code, or it can be the target of a HTML form.
 
+### Thumbnailing Files
 This form should have a single input called `file`, of type *file*.
+
+### Thumbnailing Web Pages / URLS
+This form should have a single input called `url`, of type *string*, with the URL you want to thumbnail.  This can be a `file:///` url.
 
 ## Testing
 
 `curl -o /tmp/foo.png -F file=@YOUR_DOCUMENT_OR_IMAGE http://localhost:8000/api/thumbnail` (non-video)
 
 `curl -o /tmp/foo.gif -F file=@YOUR_VIDEO http://localhost:8000/api/thumbnail` (video)
+
+`curl -o /tmp/foo.png -F url=http://... http://localhost:8000/api/thumbnail` (web page / url)
+
 

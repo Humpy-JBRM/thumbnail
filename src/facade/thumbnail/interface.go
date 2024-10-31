@@ -1,10 +1,10 @@
 package facade
 
 import (
-	"os"
+	"net/url"
 	"thumbnailer/src/data"
 )
 
 type Thumbnailer interface {
-	GetThumbnail(f *os.File) (data.Thumbnail, error)
+	GetThumbnail(u *url.URL) (data.Thumbnail, error)
 }

@@ -34,7 +34,7 @@ func RunThumbnail(cmd *cobra.Command, args []string) {
 	}
 
 	// Set the routes for this service
-	ginRouter.POST("/api/thumbnail", api.ThumbnailFile)
+	ginRouter.POST("/api/thumbnail", api.HandleThumbnail)
 
 	// Start the service
 	err = ginRouter.Run(thumbnailAddress)

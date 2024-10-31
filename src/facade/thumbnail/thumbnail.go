@@ -3,20 +3,35 @@ package facade
 import (
 	"fmt"
 	"log"
-	"os"
+	"net/url"
 	"strings"
 
 	"github.com/gabriel-vasile/mimetype"
 )
 
-func GetThumbnailer(f *os.File) (Thumbnailer, error) {
-	mt, err := mimetype.DetectFile(f.Name())
+func GetUrlThumbnailer(u *url.URL) (Thumbnailer, error) {
+	if u == nil {
+		err := fmt.Errorf("GetUrlThumbnailer(%v): URL cannot be nil", u)
+		return NewUnknownThumbnailer(err), err
+	}
+
+	if strings.EqualFold(u.Scheme, "file") {
+		// This is a file url.
+		// Delegate to the file thumbnailer
+		return GetFileThumbnailer(u.Path)
+	}
+
+	return NewHtmlThumbnailer(), nil
+}
+
+func GetFileThumbnailer(path string) (Thumbnailer, error) {
+	mt, err := mimetype.DetectFile(path)
 	if err != nil {
-		err := fmt.Errorf("GetThumbnailer(%s): Could not get mime type", f.Name())
+		err := fmt.Errorf("GetFileThumbnailer(%s): Could not get mime type", path)
 		return NewUnknownThumbnailer(err), err
 	}
 	if mt == nil {
-		err := fmt.Errorf("GetThumbnailer(%s): Could not get mime type", f.Name())
+		err := fmt.Errorf("GetFileThumbnailer(%s): Could not get mime type", path)
 		return NewUnknownThumbnailer(err), err
 	}
 
@@ -40,6 +55,6 @@ func GetThumbnailer(f *os.File) (Thumbnailer, error) {
 		return NewOfficeThumbnailer(), nil
 	}
 
-	log.Printf("GetThumbnailer(%s): mime type '%s' not supported", f.Name(), mt.String())
+	log.Printf("GetFileThumbnailer(%s): mime type '%s' not supported", path, mt.String())
 	return NewNullThumbnailer(), nil
 }

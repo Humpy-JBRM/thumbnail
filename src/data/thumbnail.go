@@ -7,6 +7,7 @@ type Thumbnail interface {
 	GetContent() []byte
 	GetWidth() int64
 	GetHeight() int64
+	GetError() error
 }
 
 type ThumbnailImpl struct {
@@ -16,6 +17,7 @@ type ThumbnailImpl struct {
 	Width    int64  `json:"width"`
 	Height   int64  `json:"height"`
 	TextBody string `json:"text_body"`
+	Error    error  `json:"error,omitempty"`
 }
 
 func (t *ThumbnailImpl) GetMimeType() string {
@@ -36,4 +38,8 @@ func (t *ThumbnailImpl) GetWidth() int64 {
 
 func (t *ThumbnailImpl) GetHeight() int64 {
 	return t.Height
+}
+
+func (t *ThumbnailImpl) GetError() error {
+	return t.Error
 }

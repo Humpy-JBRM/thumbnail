@@ -1,7 +1,7 @@
 package facade
 
 import (
-	"os"
+	"net/url"
 	"thumbnailer/src/data"
 )
 
@@ -16,7 +16,7 @@ func NewNullThumbnailer() Thumbnailer {
 	}
 }
 
-func (t *nullThumbnailer) GetThumbnail(f *os.File) (data.Thumbnail, error) {
+func (t *nullThumbnailer) GetThumbnail(u *url.URL) (data.Thumbnail, error) {
 	return &data.ThumbnailImpl{
 		Content: make([]byte, 0),
 	}, nil

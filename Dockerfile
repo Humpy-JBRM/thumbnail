@@ -13,6 +13,9 @@ RUN update-ca-certificates
 
 RUN apt install -y rclone
 
+# Google chrome, for HTML thumbnailing
+RUN apt install -y google-chrome-stable
+
 # Install all the tools we're gonna need for thumbnailing etc
 RUN apt install -y libreoffice
 RUN apt install -y libreoffice-writer

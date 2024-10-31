@@ -3,6 +3,7 @@ package facade
 import (
 	"bytes"
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -22,11 +23,11 @@ func NewPdfThumbnailer() Thumbnailer {
 	}
 }
 
-func (t *pdfThumbnailer) GetThumbnail(f *os.File) (data.Thumbnail, error) {
+func (t *pdfThumbnailer) GetThumbnail(u *url.URL) (data.Thumbnail, error) {
 	// Step 1: Create a temporary dir
 	dir, err := os.MkdirTemp("", "*-pdf")
 	if err != nil {
-		return nil, fmt.Errorf("pdf.GetThumbnail(%s): Could not create temp dir: %s", f.Name(), err.Error())
+		return nil, fmt.Errorf("pdf.GetThumbnail(%s): Could not create temp dir: %s", u.Path, err.Error())
 	}
 	defer os.RemoveAll(dir)
 
@@ -37,18 +38,18 @@ func (t *pdfThumbnailer) GetThumbnail(f *os.File) (data.Thumbnail, error) {
 		dir,
 		"--pages",
 		"1",
-		f.Name(),
+		u.Path,
 	}
-	outputFile := filepath.Join(dir, strings.ReplaceAll(filepath.Base(f.Name()), filepath.Ext(f.Name()), ".png"))
+	outputFile := filepath.Join(dir, strings.ReplaceAll(filepath.Base(u.Path), filepath.Ext(u.Path), ".png"))
 	err = util.RunCommand(dir, cmd, 10, map[string]string{}, args...)
 	if err != nil {
-		return nil, fmt.Errorf("pdf.GetThumbnail(%s): Could not generate thumbnail: %s", f.Name(), err.Error())
+		return nil, fmt.Errorf("pdf.GetThumbnail(%s): Could not generate thumbnail: %s", u.Path, err.Error())
 	}
 
 	// Step 4: Convert this image to a thumbnail with ImageMagick
 	// convert -thumbnail x300 /tmp/ScottLogic.png /tmp/thumb.png
 	cmd = "convert"
-	thumbnailFile := filepath.Join(dir, filepath.Base(f.Name())+"-thumb.png")
+	thumbnailFile := filepath.Join(dir, filepath.Base(u.Path)+"-thumb.png")
 	args = []string{
 		"-thumbnail",
 		"x300",
@@ -57,13 +58,13 @@ func (t *pdfThumbnailer) GetThumbnail(f *os.File) (data.Thumbnail, error) {
 	}
 	err = util.RunCommand(dir, cmd, 10, map[string]string{}, args...)
 	if err != nil {
-		fmt.Printf("pdf.GetThumbnail(%s): Could not generate thumbnail: %s", f.Name(), err.Error())
-		return nil, fmt.Errorf("pdf.GetThumbnail(%s): Could not generate thumbnail: %s", f.Name(), err.Error())
+		fmt.Printf("pdf.GetThumbnail(%s): Could not generate thumbnail: %s", u.Path, err.Error())
+		return nil, fmt.Errorf("pdf.GetThumbnail(%s): Could not generate thumbnail: %s", u.Path, err.Error())
 	}
 
 	thumbnailBytes, err := os.ReadFile(thumbnailFile)
 	if err != nil {
-		return nil, fmt.Errorf("pdf.GetThumbnail(%s): Could not get thumbnail bytes: %s", f.Name(), err.Error())
+		return nil, fmt.Errorf("pdf.GetThumbnail(%s): Could not get thumbnail bytes: %s", u.Path, err.Error())
 	}
 
 	// Step 5: get the width and height of the thumbnail
@@ -72,7 +73,7 @@ func (t *pdfThumbnailer) GetThumbnail(f *os.File) (data.Thumbnail, error) {
 	// Step 6: Get the mime type of the thumbnail
 	mt := mimetype.Detect(thumbnailBytes)
 	if mt == nil {
-		return nil, fmt.Errorf("pdf.GetThumbnail(%s): Could not get thumbnail mime type", f.Name())
+		return nil, fmt.Errorf("pdf.GetThumbnail(%s): Could not get thumbnail mime type", u.Path)
 	}
 
 	// Step 7: Generate the thumbnail object and return

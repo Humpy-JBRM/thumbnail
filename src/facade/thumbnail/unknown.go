@@ -1,7 +1,7 @@
 package facade
 
 import (
-	"os"
+	"net/url"
 	"thumbnailer/src/data"
 )
 
@@ -17,6 +17,6 @@ func NewUnknownThumbnailer(err error) Thumbnailer {
 	}
 }
 
-func (t *unknownThumbnailer) GetThumbnail(file *os.File) (data.Thumbnail, error) {
+func (t *unknownThumbnailer) GetThumbnail(u *url.URL) (data.Thumbnail, error) {
 	panic("TODO(john): Implement unknown thumbnailer")
 }
