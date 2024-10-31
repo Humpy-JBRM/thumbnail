@@ -11,9 +11,9 @@ For video, the thumbnail is an animated gif of a selection of the video frames. 
 
 ## Running on Docker
 
-	- make thumbnailer docker
+	- `docker build -t thumbnailer:latest .`
 
-	- docker run -p 8000:8000 thumbnailer:latest
+	- `docker run -p 8000:8000 thumbnailer:latest`
 
 and the thumbnailer will be running on http://localhost:8000.
 
@@ -42,10 +42,11 @@ Install the required packages:
     sudo apt install -y curl
     sudo apt install -y wget
 
-Install go 1.19 from https://golang.org.
+Install go 1.21 from https://golang.org.
 
 Compile the binary:
 
+`go mod tidy`
 `go build .`
 
 ## Running
@@ -59,15 +60,13 @@ You need to enable PDF thumbnailing:
 
 Execute the program:
 
-`./humpy thumbnail`
-
-By default, the service runs on *:8000.  This can be changed with a command-line flag.  See `./humpy -?` for details.
+`./thumbnailer -f config.yml thumbnail -l 0.0.0.0:8000`
 
 ## Operation
 
 The endpoint of the thumbnailer is `http://localhost:8000/api/thumbnail`
 
-This endpoint takes a `POST` request, with a content type of `multipart/form-data`.
+This endpoint takes a `POST` request, with a content type of `multipart/form-data`.  So you can either invoke it from code, or it can be the target of a HTML form.
 
 This form should have a single input called `file`, of type *file*.
 
