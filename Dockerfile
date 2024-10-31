@@ -1,4 +1,4 @@
-FROM golang:1.21 AS builder
+FROM golang:1.23 AS builder
 WORKDIR /app
 COPY . .
 RUN go mod tidy
@@ -14,7 +14,10 @@ RUN update-ca-certificates
 RUN apt install -y rclone
 
 # Google chrome, for HTML thumbnailing
-RUN apt install -y google-chrome-stable
+RUN apt install -y curl
+RUN curl -s -o /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+    apt install -y /tmp/chrome.deb &&\
+    rm /tmp/chrome.deb
 
 # Install all the tools we're gonna need for thumbnailing etc
 RUN apt install -y libreoffice
