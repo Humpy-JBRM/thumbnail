@@ -3,9 +3,9 @@ package facade
 import (
 	"bytes"
 	"fmt"
-	"humpy/src/data"
 	"io"
 	"os"
+	"thumbnailer/src/data"
 
 	"image"
 	_ "image/gif"

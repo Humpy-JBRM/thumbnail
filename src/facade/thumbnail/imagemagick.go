@@ -2,11 +2,10 @@ package facade
 
 import (
 	"fmt"
-	"humpy/src/data"
-	"humpy/src/util"
-	"io/ioutil"
 	"os"
 	"path/filepath"
+	"thumbnailer/src/data"
+	"thumbnailer/src/util"
 
 	"github.com/gabriel-vasile/mimetype"
 )
@@ -23,7 +22,7 @@ func NewImagemagickThumbnailer() Thumbnailer {
 
 func (t *imagemagickThumbnailer) GetThumbnail(f *os.File) (data.Thumbnail, error) {
 	// Step 1: Create a temporary dir
-	dir, err := ioutil.TempDir("", "*-magick")
+	dir, err := os.MkdirTemp("", "*-magick")
 	if err != nil {
 		return nil, fmt.Errorf("imagemagick.GetThumbnail(%s): Could not create temp dir: %s", f.Name(), err.Error())
 	}
@@ -44,7 +43,7 @@ func (t *imagemagickThumbnailer) GetThumbnail(f *os.File) (data.Thumbnail, error
 	}
 
 	// Step 5: Get the thumbnail bytes
-	thumbnailBytes, err := ioutil.ReadFile(thumbnailFile)
+	thumbnailBytes, err := os.ReadFile(thumbnailFile)
 	if err != nil {
 		return nil, fmt.Errorf("imagemagick.GetThumbnail(%s): Could not get thumbnail bytes: %s", f.Name(), err.Error())
 	}

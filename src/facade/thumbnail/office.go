@@ -3,13 +3,12 @@ package facade
 import (
 	"bytes"
 	"fmt"
-	"humpy/src/data"
-	"humpy/src/util"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+	"thumbnailer/src/data"
+	"thumbnailer/src/util"
 
 	"github.com/gabriel-vasile/mimetype"
 )
@@ -26,7 +25,7 @@ func NewOfficeThumbnailer() Thumbnailer {
 
 func (t *officeThumbnailer) GetThumbnail(f *os.File) (data.Thumbnail, error) {
 	// Step 1: Create a temporary dir
-	dir, err := ioutil.TempDir("", "*-office")
+	dir, err := os.MkdirTemp("", "*-office")
 	if err != nil {
 		log.Printf("office.GetThumbnail(%s): Could not create temp dir: %s", f.Name(), err.Error())
 		return nil, fmt.Errorf("office.GetThumbnail(%s): Could not create temp dir: %s", f.Name(), err.Error())
@@ -73,7 +72,7 @@ func (t *officeThumbnailer) GetThumbnail(f *os.File) (data.Thumbnail, error) {
 	}
 
 	// Step 5: Get the thumbnail bytes
-	thumbnailBytes, err := ioutil.ReadFile(thumbnailFile)
+	thumbnailBytes, err := os.ReadFile(thumbnailFile)
 	if err != nil {
 		fmt.Printf("office.GetThumbnail(%s): Could not get thumbnail bytes: %s", f.Name(), err.Error())
 		return nil, fmt.Errorf("office.GetThumbnail(%s): Could not get thumbnail bytes: %s", f.Name(), err.Error())

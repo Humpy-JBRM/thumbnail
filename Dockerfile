@@ -1,6 +1,11 @@
-# TODO: two-stage build
+FROM golang:1.21 AS builder
+WORKDIR /app
+COPY . .
+RUN go mod tidy
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o thumbnailer .
+
 # TODO: use the absolute minimum base package and not a full distro
-FROM ubuntu:latest
+FROM ubuntu:22.04
 
 RUN apt update
 RUN apt install -y ca-certificates
@@ -40,7 +45,8 @@ COPY ROOT/ROOT.tar.gz /var/tmp
 RUN tar xvzf /var/tmp/ROOT.tar.gz
 
 # Copy the binary and the config
-COPY ./thumbnailer /
+COPY --from=builder /app/thumbnailer /
 COPY config.yml /
 
+EXPOSE 8000
 ENTRYPOINT ["/thumbnailer", "-f", "/config.yml", "thumbnail", "-l", "0.0.0.0:8000"]

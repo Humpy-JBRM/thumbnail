@@ -1,8 +1,8 @@
 package facade
 
 import (
-	"humpy/src/data"
 	"os"
+	"thumbnailer/src/data"
 )
 
 type naiiveThumbnailer struct {

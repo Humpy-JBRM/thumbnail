@@ -3,12 +3,11 @@ package facade
 import (
 	"bytes"
 	"fmt"
-	"humpy/src/data"
-	"humpy/src/util"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+	"thumbnailer/src/data"
+	"thumbnailer/src/util"
 
 	"github.com/gabriel-vasile/mimetype"
 )
@@ -25,7 +24,7 @@ func NewPdfThumbnailer() Thumbnailer {
 
 func (t *pdfThumbnailer) GetThumbnail(f *os.File) (data.Thumbnail, error) {
 	// Step 1: Create a temporary dir
-	dir, err := ioutil.TempDir("", "*-pdf")
+	dir, err := os.MkdirTemp("", "*-pdf")
 	if err != nil {
 		return nil, fmt.Errorf("pdf.GetThumbnail(%s): Could not create temp dir: %s", f.Name(), err.Error())
 	}
@@ -62,7 +61,7 @@ func (t *pdfThumbnailer) GetThumbnail(f *os.File) (data.Thumbnail, error) {
 		return nil, fmt.Errorf("pdf.GetThumbnail(%s): Could not generate thumbnail: %s", f.Name(), err.Error())
 	}
 
-	thumbnailBytes, err := ioutil.ReadFile(thumbnailFile)
+	thumbnailBytes, err := os.ReadFile(thumbnailFile)
 	if err != nil {
 		return nil, fmt.Errorf("pdf.GetThumbnail(%s): Could not get thumbnail bytes: %s", f.Name(), err.Error())
 	}

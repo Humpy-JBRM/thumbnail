@@ -1,6 +1,6 @@
 package main
 
-import "humpy/src/cmd"
+import "thumbnailer/src/cmd"
 
 // Delegate to cobra
 func main() {

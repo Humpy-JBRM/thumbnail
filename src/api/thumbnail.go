@@ -2,12 +2,12 @@ package api
 
 import (
 	"fmt"
-	thumbnailer "humpy/src/facade/thumbnail"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	thumbnailer "thumbnailer/src/facade/thumbnail"
 
 	"github.com/gin-gonic/gin"
 )

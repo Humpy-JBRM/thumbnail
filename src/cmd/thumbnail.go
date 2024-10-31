@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"humpy/src/api"
 	"log"
+	"thumbnailer/src/api"
 
 	"github.com/spf13/cobra"
 )

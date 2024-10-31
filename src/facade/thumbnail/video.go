@@ -2,13 +2,12 @@ package facade
 
 import (
 	"fmt"
-	"humpy/src/data"
-	"humpy/src/util"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+	"thumbnailer/src/data"
+	"thumbnailer/src/util"
 
 	"github.com/gabriel-vasile/mimetype"
 )
@@ -25,7 +24,7 @@ func NewVideoThumbnailer() Thumbnailer {
 
 func (t *videoThumbnailer) GetThumbnail(f *os.File) (data.Thumbnail, error) {
 	// Step 1: Create a temporary dir
-	dir, err := ioutil.TempDir("", "")
+	dir, err := os.MkdirTemp("", "")
 	if err != nil {
 		return nil, fmt.Errorf("video.GetThumbnail(%s): Could not create temp dir: %s", f.Name(), err.Error())
 	}
@@ -50,7 +49,7 @@ func (t *videoThumbnailer) GetThumbnail(f *os.File) (data.Thumbnail, error) {
 	if err != nil {
 		return nil, fmt.Errorf("video.GetThumbnail(%s): Could not generate thumbnail: %s", f.Name(), err.Error())
 	}
-	thumbnailBytes, err := ioutil.ReadFile(outputFile)
+	thumbnailBytes, err := os.ReadFile(outputFile)
 	if err != nil {
 		return nil, fmt.Errorf("video.GetThumbnail(%s): Could not get thumbnail bytes: %s", f.Name(), err.Error())
 	}
