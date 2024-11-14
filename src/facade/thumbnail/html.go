@@ -60,7 +60,7 @@ func (t *htmlThumbnailer) GetThumbnail(u *url.URL) (data.Thumbnail, error) {
 		chromedp.CaptureScreenshot(&screenshotBuffer),
 	)
 	if err != nil {
-		log.Printf("HtmlThumbnail(%s, %s): Could not create temp directory: %s", u.String(), destDir, err.Error())
+		log.Printf("HtmlThumbnail(%s, %s): %s", u.String(), destDir, err.Error())
 		thumbnail.Error = err
 		return &thumbnail, err
 	}
@@ -70,7 +70,7 @@ func (t *htmlThumbnailer) GetThumbnail(u *url.URL) (data.Thumbnail, error) {
 	destFile := path.Join(destDir, fmt.Sprintf("%s.png", u.Host))
 	err = os.WriteFile(destFile, screenshotBuffer, 0644)
 	if err != nil {
-		log.Printf("HtmlThumbnail(%s, %s): Could not create temp directory: %s", u.String(), destDir, err.Error())
+		log.Printf("HtmlThumbnail(%s, %s): Could not write thumbnail file '%s': %s", u.String(), destDir, destFile, err.Error())
 		thumbnail.Error = err
 		return &thumbnail, err
 	}

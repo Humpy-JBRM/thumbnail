@@ -1,6 +1,8 @@
 module thumbnailer
 
-go 1.21
+go 1.23
+
+toolchain go1.23.1
 
 require (
 	github.com/chromedp/chromedp v0.11.1
