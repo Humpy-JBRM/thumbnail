@@ -54,5 +54,5 @@ RUN tar xvzf /var/tmp/ROOT.tar.gz
 COPY --from=builder /app/thumbnailer /
 COPY config.yml /
 
-EXPOSE 8000
-ENTRYPOINT ["/thumbnailer", "-f", "/config.yml", "thumbnail", "-l", "0.0.0.0:8000"]
+EXPOSE 8001
+ENTRYPOINT ["/thumbnailer", "-f", "/config.yml", "thumbnail", "-l", "0.0.0.0:8001"]

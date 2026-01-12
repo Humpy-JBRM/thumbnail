@@ -1,5 +1,10 @@
 # Humpy config
 
 config:
+  listen: "0.0.0.0:8001"
+  server:
+    enabled: true
+    path: /var/tmp/thumbnail
   thumbnail:
     impl: linux
+

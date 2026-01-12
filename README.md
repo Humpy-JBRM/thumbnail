@@ -14,9 +14,9 @@ For video, the thumbnail is an animated gif of a selection of the video frames. 
 
 	- `docker build -t thumbnailer:latest .`
 
-	- `docker run -p 8000:8000 thumbnailer:latest`
+	- `docker run -p 8001:8001 thumbnailer:latest`
 
-and the thumbnailer will be running on http://localhost:8000.
+and the thumbnailer will be running on http://localhost:8001.
 
 
 ## Installing (VPS or server)
@@ -62,11 +62,11 @@ You need to enable PDF thumbnailing:
 
 Execute the program:
 
-`./thumbnailer -f config.yml thumbnail -l 0.0.0.0:8000`
+`./thumbnailer -f config.yml thumbnail -l 0.0.0.0:8001`
 
 ## Operation
 
-The endpoint of the thumbnailer is `http://localhost:8000/api/thumbnail`
+The endpoint of the thumbnailer is `http://localhost:8001/api/thumbnail`
 
 This endpoint takes a `POST` request, with a content type of `multipart/form-data`.  So you can either invoke it from code, or it can be the target of a HTML form.
 
@@ -78,10 +78,29 @@ This form should have a single input called `url`, of type *string*, with the UR
 
 ## Testing
 
-`curl -o /tmp/foo.png -F file=@YOUR_DOCUMENT_OR_IMAGE http://localhost:8000/api/thumbnail` (non-video)
+`curl -o /tmp/foo.png -F file=@YOUR_DOCUMENT_OR_IMAGE http://localhost:8001/api/thumbnail` (non-video)
 
-`curl -o /tmp/foo.gif -F file=@YOUR_VIDEO http://localhost:8000/api/thumbnail` (video)
+`curl -o /tmp/foo.gif -F file=@YOUR_VIDEO http://localhost:8001/api/thumbnail` (video)
 
-`curl -o /tmp/foo.png -F url=http://... http://localhost:8000/api/thumbnail` (web page / url)
+`curl -o /tmp/foo.png -F url=http://... http://localhost:8001/api/thumbnail` (web page / url)
+
+### File Server Enabled
+If `config.server.enabled` is `true`, then the thumbnail server will write the thumbnails to
+disk, and serve them over HTTP
+
+`curl -o /dev/null -F id=12345 -F file=@YOUR_DOCUMENT_OR_IMAGE http://localhost:8001/api/thumbnail` 
+`curl -o /tmp/foo.png http://localhost:8001/thumbnail/12345`
+
+
+
+## TODO
+Configurable ability to act as a thumbnail server:
+
+	> GET /thumbnail/{ID}
+	> HTTP/1.0 200 OK
+	> Content-Type: image/png
+	> Content-Length: 2345
+	>
+	> <PNG thumbnail>
 
 
